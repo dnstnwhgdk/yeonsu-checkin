@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>연수 확인 출석체크</title>
+<style>
+  :root {
+    --paper: #F6F4EF;
+    --ink: #22283A;
+    --ink-soft: #5A6072;
+    --line: #D9D5C9;
+    --accent: #2F6F62;
+    --accent-soft: #E4EFE8;
+    --danger: #B3452F;
+  }
+
+  * { box-sizing: border-box; }
+
+  html {
+    height: 100%;
+    overscroll-behavior-y: none;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+
+  button, .confirm-row, .submit-btn {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .wrap {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 28px 20px calc(60px + env(safe-area-inset-bottom));
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  input[type="text"] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  .masthead {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 14px;
+    margin-bottom: 24px;
+  }
+
+  .masthead .kicker {
+    font-size: 13px;
+    color: var(--ink-soft);
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
+  }
+
+  .masthead h1 {
+    font-size: 22px;
+    line-height: 1.35;
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+  }
+
+  section {
+    margin-bottom: 26px;
+  }
+
+  .section-label {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+
+  .content-box {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 18px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--ink);
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  .content-box p { margin: 0 0 10px; }
+  .content-box p:last-child { margin-bottom: 0; }
+  .content-box ul { margin: 0; padding-left: 20px; }
+  .content-box li { margin-bottom: 6px; }
+
+  .confirm-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 16px;
+    min-height: 44px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .confirm-row input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    accent-color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .confirm-row label {
+    font-size: 15px;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 14px 14px;
+    font-size: 16px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: #fff;
+    color: var(--ink);
+  }
+
+  input[type="text"]:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .sig-box {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 10px;
+    overscroll-behavior: none;
+  }
+
+  canvas {
+    width: 100%;
+    height: min(38vh, 220px);
+    min-height: 160px;
+    display: block;
+    border: 1px dashed var(--line);
+    border-radius: 3px;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    background:
+      linear-gradient(transparent 0, transparent calc(100% - 1px), var(--line) calc(100% - 1px));
+  }
+
+  .sig-tools {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .sig-tools button {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 4px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--ink);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.15s ease, opacity 0.15s ease;
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .submit-btn:not(:disabled):active {
+    background: var(--accent);
+  }
+
+  .error-msg {
+    font-size: 13px;
+    color: var(--danger);
+    margin-top: 8px;
+    display: none;
+  }
+
+  .status-msg {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 12px;
+    text-align: center;
+    min-height: 18px;
+  }
+
+  /* 완료 화면 */
+  .done-screen {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .done-mark {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 28px;
+  }
+
+  .done-screen h2 {
+    font-size: 19px;
+    margin: 0 0 8px;
+  }
+
+  .done-screen p {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .done-detail {
+    margin-top: 24px;
+    text-align: left;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 16px 18px;
+    font-size: 14px;
+  }
+
+  .done-detail div {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .done-detail div:last-child { border-bottom: none; }
+  .done-detail span:first-child { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<div class="wrap" id="formScreen">
+  <div class="masthead">
+    <div class="kicker">연수 확인 출석체크</div>
+    <h1 id="trainingTitle">교권보호 및 교권침해 예방(교육활동 보호) 학부모 연수</h1>
+    <div class="meta-row">
+      <span id="trainingDate">2026-09-01</span>
+      <span id="trainingOrg">한빛누리중학교</span>
+    </div>
+  </div>
+
+  <section>
+    <div class="section-label">연수 내용</div>
+    <div class="content-box" id="trainingContent">
+      <p><strong>교권보호 및 교권침해 예방(교육활동 보호) 학부모 연수</strong></p>
+      <p>담당자가 배포한 연수 자료(문서 또는 영상)를 끝까지 확인하신 후, 아래 체크박스에 체크하고 이름과 서명을 작성해 주세요.</p>
+      <p>궁금한 사항은 담당 부서에 문의해 주시기 바랍니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="confirm-row" id="confirmRow">
+      <input type="checkbox" id="confirmCheck">
+      <label for="confirmCheck">위의 내용을 확인하고 연수했습니다</label>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">이름</div>
+    <input type="text" id="nameInput" placeholder="이름을 입력하세요" autocomplete="name">
+  </section>
+
+  <section>
+    <div class="section-label">서명</div>
+    <div class="sig-box">
+      <canvas id="sigCanvas"></canvas>
+      <div class="sig-tools">
+        <span id="sigHint">화면에 손가락으로 서명해 주세요</span>
+        <button type="button" id="clearSig">지우기</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <button class="submit-btn" id="submitBtn" disabled>제출하기</button>
+    <div class="error-msg" id="errorMsg"></div>
+    <div class="status-msg" id="statusMsg"></div>
+  </section>
+</div>
+
+<div class="wrap done-screen" id="doneScreen">
+  <div class="done-mark">✓</div>
+  <h2>출석이 확인되었습니다</h2>
+  <p>연수 확인 내용이 정상적으로 제출되었습니다.</p>
+  <div class="done-detail">
+    <div><span>이름</span><span id="doneName"></span></div>
+    <div><span>연수명</span><span id="doneTitle"></span></div>
+    <div><span>제출시각</span><span id="doneTime"></span></div>
+  </div>
+</div>
+
+<script>
+  // ====== 담당자 설정 영역 ======
+  // Google Apps Script를 웹앱으로 배포한 뒤 생성되는 URL을 아래에 입력하세요.
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzealglQkT1WYkDeent-zXlXlZUX3sph4zz4mAjzueQdtTqzR-3dLqFLpMkanHiYQ/exec";
+  const DEPARTMENT = "교육기획부"; // 이 페이지가 어느 부서/시트로 저장될지 지정
+  // ================================
+
+  document.getElementById('trainingDate').textContent =
+    new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date());
+
+  // --- 서명 캔버스 (Pointer Events: 손가락/펜/마우스 통합 처리) ---
+  const canvas = document.getElementById('sigCanvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false, hasSignature = false;
+  let lastX = 0, lastY = 0, midX = 0, midY = 0;
+
+  function resizeCanvas() {
+    const data = hasSignature ? canvas.toDataURL() : null;
+    const rect = canvas.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = rect.width * ratio;
+    canvas.height = rect.height * ratio;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0); // 누적 스케일 방지 (매번 초기화 후 적용)
+    ctx.lineWidth = 2.6;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#22283A';
+    if (data) {
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, rect.width, rect.height);
+      img.src = data;
+    }
+  }
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resizeCanvas, 120);
+  });
+  resizeCanvas();
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
+  function startDraw(e) {
+    e.preventDefault();
+    canvas.setPointerCapture(e.pointerId);
+    drawing = true;
+    hasSignature = true;
+    const p = getPos(e);
+    lastX = midX = p.x;
+    lastY = midY = p.y;
+    document.getElementById('sigHint').textContent = '';
+    validateForm();
+  }
+
+  function draw(e) {
+    if (!drawing) return;
+    e.preventDefault();
+    const p = getPos(e);
+    const newMidX = (lastX + p.x) / 2;
+    const newMidY = (lastY + p.y) / 2;
+    // 중간점을 지나는 곡선으로 부드럽게 이어그림
+    ctx.beginPath();
+    ctx.moveTo(midX, midY);
+    ctx.quadraticCurveTo(lastX, lastY, newMidX, newMidY);
+    ctx.stroke();
+    midX = newMidX; midY = newMidY;
+    lastX = p.x; lastY = p.y;
+  }
+
+  function endDraw(e) {
+    drawing = false;
+  }
+
+  canvas.addEventListener('pointerdown', startDraw);
+  canvas.addEventListener('pointermove', draw);
+  canvas.addEventListener('pointerup', endDraw);
+  canvas.addEventListener('pointercancel', endDraw);
+  canvas.addEventListener('pointerleave', endDraw);
+  // 캔버스 위에서 스와이프해도 배경 페이지가 스크롤/새로고침 되지 않도록 차단
+  canvas.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+
+  document.getElementById('clearSig').addEventListener('click', () => {
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    hasSignature = false;
+    document.getElementById('sigHint').textContent = '화면에 손가락으로 서명해 주세요';
+    validateForm();
+  });
+
+  // --- 체크박스 행 클릭 시 토글 ---
+  document.getElementById('confirmRow').addEventListener('click', (e) => {
+    if (e.target.id !== 'confirmCheck') {
+      document.getElementById('confirmCheck').checked = !document.getElementById('confirmCheck').checked;
+    }
+    validateForm();
+  });
+  document.getElementById('confirmCheck').addEventListener('change', validateForm);
+  document.getElementById('nameInput').addEventListener('input', validateForm);
+
+  // --- 유효성 검사 ---
+  function validateForm() {
+    const checked = document.getElementById('confirmCheck').checked;
+    const name = document.getElementById('nameInput').value.trim();
+    const ok = checked && name.length > 0 && hasSignature;
+    document.getElementById('submitBtn').disabled = !ok;
+    return ok;
+  }
+
+  // --- 제출 ---
+  document.getElementById('submitBtn').addEventListener('click', async () => {
+    const errorEl = document.getElementById('errorMsg');
+    const statusEl = document.getElementById('statusMsg');
+    errorEl.style.display = 'none';
+
+    if (!validateForm()) return;
+    if (SCRIPT_URL.includes('여기에')) {
+      errorEl.textContent = '담당자 설정이 필요합니다: SCRIPT_URL을 입력해 주세요.';
+      errorEl.style.display = 'block';
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    statusEl.textContent = '제출 중입니다...';
+
+    const payload = {
+      department: DEPARTMENT,
+      trainingTitle: document.getElementById('trainingTitle').textContent,
+      name: document.getElementById('nameInput').value.trim(),
+      confirmed: document.getElementById('confirmCheck').checked,
+      signature: canvas.toDataURL('image/png'),
+      submittedAt: new Date().toISOString()
+    };
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+
+      // no-cors 모드는 응답을 읽을 수 없어 성공으로 간주하고 완료 화면 표시
+      document.getElementById('doneName').textContent = payload.name;
+      document.getElementById('doneTitle').textContent = payload.trainingTitle;
+      document.getElementById('doneTime').textContent =
+        new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit' }).format(new Date());
+
+      document.getElementById('formScreen').style.display = 'none';
+      document.getElementById('doneScreen').style.display = 'block';
+    } catch (err) {
+      statusEl.textContent = '';
+      errorEl.textContent = '제출에 실패했습니다. 네트워크 상태를 확인하고 다시 시도해 주세요.';
+      errorEl.style.display = 'block';
+      btn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>
