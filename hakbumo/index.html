@@ -20,10 +20,7 @@
 
   * { box-sizing: border-box; }
 
-  html {
-    height: 100%;
-    overscroll-behavior-y: none;
-  }
+  html { height: 100%; overscroll-behavior-y: none; }
 
   body {
     margin: 0;
@@ -37,60 +34,127 @@
   }
 
   .wrap {
-    max-width: 440px;
+    max-width: 460px;
     margin: 0 auto;
-    padding: 40px 20px calc(60px + env(safe-area-inset-bottom));
+    padding: 32px 20px calc(60px + env(safe-area-inset-bottom));
     padding-left: max(20px, env(safe-area-inset-left));
     padding-right: max(20px, env(safe-area-inset-right));
+    -webkit-user-select: none;
+    user-select: none;
   }
+
+  input, select, textarea { -webkit-user-select: text; user-select: text; }
 
   .masthead {
     border-bottom: 2px solid var(--ink);
     padding-bottom: 14px;
-    margin-bottom: 30px;
+    margin-bottom: 26px;
   }
 
-  .masthead .kicker {
-    font-size: 13px;
-    color: var(--ink-soft);
-    margin-bottom: 4px;
-  }
+  .masthead .kicker { font-size: 13px; color: var(--ink-soft); margin-bottom: 4px; }
+  .masthead h1 { font-size: 22px; line-height: 1.35; margin: 0; font-weight: 700; }
+  .meta-row { font-size: 13px; color: var(--ink-soft); margin-top: 8px; }
 
-  .masthead h1 {
-    font-size: 22px;
-    line-height: 1.35;
-    margin: 0;
-    font-weight: 700;
-  }
+  section { margin-bottom: 20px; }
 
-  .meta-row {
-    font-size: 13px;
-    color: var(--ink-soft);
-    margin-top: 8px;
-  }
-
-  section { margin-bottom: 22px; }
-
-  .field-label {
+  .section-label {
     font-size: 14px;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     color: var(--ink);
   }
 
-  input[type="text"] {
+  .field-label {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+
+  input[type="text"], input[type="tel"], select {
     width: 100%;
-    padding: 16px 14px;
+    padding: 14px 14px;
     font-size: 16px;
     border: 1px solid var(--line);
     border-radius: 4px;
     background: #fff;
     color: var(--ink);
+    -webkit-appearance: none;
+    appearance: none;
   }
 
-  input[type="text"]:focus {
+  select {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9'><path d='M1 1l6 6 6-6' stroke='%235A6072' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 34px;
+  }
+
+  input:focus, select:focus {
     outline: 2px solid var(--accent);
     outline-offset: 1px;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 16px;
+  }
+
+  .sig-box {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 10px;
+    overscroll-behavior: none;
+  }
+
+  canvas {
+    width: 100%;
+    height: min(32vh, 190px);
+    min-height: 150px;
+    display: block;
+    border: 1px dashed var(--line);
+    border-radius: 3px;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    background: linear-gradient(transparent 0, transparent calc(100% - 1px), var(--line) calc(100% - 1px));
+  }
+
+  .sig-tools {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .sig-tools button {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 4px;
+  }
+
+  .optional-tag {
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-weight: 400;
   }
 
   .submit-btn {
@@ -103,18 +167,11 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin-top: 10px;
     transition: background 0.15s ease, opacity 0.15s ease;
   }
 
-  .submit-btn:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-  }
-
-  .submit-btn:not(:disabled):active {
-    background: var(--accent);
-  }
+  .submit-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .submit-btn:not(:disabled):active { background: var(--accent); }
 
   .error-msg {
     font-size: 13px;
@@ -131,11 +188,7 @@
     min-height: 18px;
   }
 
-  .done-screen {
-    display: none;
-    text-align: center;
-    padding: 70px 20px;
-  }
+  .done-screen { display: none; text-align: center; padding: 60px 20px; }
 
   .done-mark {
     width: 56px;
@@ -150,17 +203,8 @@
     font-size: 28px;
   }
 
-  .done-screen h2 {
-    font-size: 19px;
-    margin: 0 0 8px;
-  }
-
-  .done-screen p {
-    font-size: 14px;
-    color: var(--ink-soft);
-    line-height: 1.6;
-    margin: 0;
-  }
+  .done-screen h2 { font-size: 19px; margin: 0 0 8px; }
+  .done-screen p { font-size: 14px; color: var(--ink-soft); line-height: 1.6; margin: 0; }
 
   .done-detail {
     margin-top: 24px;
@@ -172,12 +216,7 @@
     font-size: 14px;
   }
 
-  .done-detail div {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-    border-bottom: 1px solid var(--line);
-  }
+  .done-detail div { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line); }
   .done-detail div:last-child { border-bottom: none; }
   .done-detail span:first-child { color: var(--ink-soft); }
 </style>
@@ -192,13 +231,70 @@
   </div>
 
   <section>
-    <div class="field-label">자녀(학생) 이름</div>
-    <input type="text" id="studentInput" placeholder="예) 정윤재" autocomplete="off">
+    <div class="section-label">자녀(학생) 정보</div>
+    <div class="card">
+      <div class="row-2">
+        <div class="field">
+          <div class="field-label">학년</div>
+          <select id="gradeInput">
+            <option value="">선택</option>
+            <option value="1학년">1학년</option>
+            <option value="2학년">2학년</option>
+            <option value="3학년">3학년</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="field-label">반</div>
+          <select id="classInput">
+            <option value="">선택</option>
+            <option value="1반">1반</option>
+            <option value="2반">2반</option>
+            <option value="3반">3반</option>
+            <option value="4반">4반</option>
+            <option value="5반">5반</option>
+            <option value="6반">6반</option>
+            <option value="7반">7반</option>
+            <option value="8반">8반</option>
+            <option value="9반">9반</option>
+            <option value="10반">10반</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">성명</div>
+        <input type="text" id="studentInput" placeholder="자녀 이름">
+      </div>
+    </div>
   </section>
 
   <section>
-    <div class="field-label">학부모 성함</div>
-    <input type="text" id="parentInput" placeholder="예) 정OO 학부모" autocomplete="name">
+    <div class="section-label">학부모 정보</div>
+    <div class="card">
+      <div class="field">
+        <div class="field-label">성명</div>
+        <input type="text" id="parentInput" placeholder="학부모 성함" autocomplete="name">
+      </div>
+      <div class="field">
+        <div class="field-label">연락처</div>
+        <input type="tel" id="phoneInput" placeholder="010-0000-0000" autocomplete="tel" inputmode="numeric">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">서명</div>
+    <div class="sig-box">
+      <canvas id="sigCanvas"></canvas>
+      <div class="sig-tools">
+        <span id="sigHint">화면에 손가락으로 서명해 주세요</span>
+        <button type="button" id="clearSig">지우기</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">비고 <span class="optional-tag">(선택)</span></div>
+    <input type="text" id="noteInput" placeholder="전달사항이 있으면 적어주세요">
   </section>
 
   <section>
@@ -228,18 +324,122 @@
   document.getElementById('eventDate').textContent =
     new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date());
 
+  // --- 연락처 자동 하이픈 ---
+  const phoneInput = document.getElementById('phoneInput');
+  phoneInput.addEventListener('input', () => {
+    let digits = phoneInput.value.replace(/\D/g, '').slice(0, 11);
+    let formatted = digits;
+    if (digits.length > 3 && digits.length <= 7) {
+      formatted = digits.slice(0, 3) + '-' + digits.slice(3);
+    } else if (digits.length > 7) {
+      formatted = digits.slice(0, 3) + '-' + digits.slice(3, 7) + '-' + digits.slice(7);
+    }
+    phoneInput.value = formatted;
+    validateForm();
+  });
+
+  // --- 서명 캔버스 (Pointer Events) ---
+  const canvas = document.getElementById('sigCanvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false, hasSignature = false;
+  let lastX = 0, lastY = 0, midX = 0, midY = 0;
+
+  function resizeCanvas() {
+    const data = hasSignature ? canvas.toDataURL() : null;
+    const rect = canvas.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = rect.width * ratio;
+    canvas.height = rect.height * ratio;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.lineWidth = 2.6;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#22283A';
+    if (data) {
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, rect.width, rect.height);
+      img.src = data;
+    }
+  }
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resizeCanvas, 120);
+  });
+  resizeCanvas();
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
+  function startDraw(e) {
+    e.preventDefault();
+    canvas.setPointerCapture(e.pointerId);
+    drawing = true;
+    hasSignature = true;
+    const p = getPos(e);
+    lastX = midX = p.x;
+    lastY = midY = p.y;
+    document.getElementById('sigHint').textContent = '';
+    validateForm();
+  }
+
+  function draw(e) {
+    if (!drawing) return;
+    e.preventDefault();
+    const p = getPos(e);
+    const newMidX = (lastX + p.x) / 2;
+    const newMidY = (lastY + p.y) / 2;
+    ctx.beginPath();
+    ctx.moveTo(midX, midY);
+    ctx.quadraticCurveTo(lastX, lastY, newMidX, newMidY);
+    ctx.stroke();
+    midX = newMidX; midY = newMidY;
+    lastX = p.x; lastY = p.y;
+  }
+
+  function endDraw() { drawing = false; }
+
+  canvas.addEventListener('pointerdown', startDraw);
+  canvas.addEventListener('pointermove', draw);
+  canvas.addEventListener('pointerup', endDraw);
+  canvas.addEventListener('pointercancel', endDraw);
+  canvas.addEventListener('pointerleave', endDraw);
+  canvas.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+
+  document.getElementById('clearSig').addEventListener('click', () => {
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    hasSignature = false;
+    document.getElementById('sigHint').textContent = '화면에 손가락으로 서명해 주세요';
+    validateForm();
+  });
+
+  // --- 유효성 검사 ---
+  const gradeInput = document.getElementById('gradeInput');
+  const classInput = document.getElementById('classInput');
   const studentInput = document.getElementById('studentInput');
   const parentInput = document.getElementById('parentInput');
   const submitBtn = document.getElementById('submitBtn');
 
   function validateForm() {
-    const ok = studentInput.value.trim().length > 0 && parentInput.value.trim().length > 0;
+    const ok =
+      gradeInput.value !== '' &&
+      classInput.value !== '' &&
+      studentInput.value.trim().length > 0 &&
+      parentInput.value.trim().length > 0 &&
+      phoneInput.value.trim().length > 0 &&
+      hasSignature;
     submitBtn.disabled = !ok;
     return ok;
   }
-  studentInput.addEventListener('input', validateForm);
-  parentInput.addEventListener('input', validateForm);
+  [gradeInput, classInput, studentInput, parentInput].forEach(el => {
+    el.addEventListener('input', validateForm);
+    el.addEventListener('change', validateForm);
+  });
 
+  // --- 제출 ---
   submitBtn.addEventListener('click', async () => {
     const errorEl = document.getElementById('errorMsg');
     const statusEl = document.getElementById('statusMsg');
@@ -256,12 +456,15 @@
     statusEl.textContent = '제출 중입니다...';
 
     const payload = {
+      formType: 'parent_checkin',
       department: SHEET_NAME,
-      trainingTitle: document.getElementById('eventTitle').textContent,
-      note: studentInput.value.trim(),   // 자녀(학생) 이름
-      name: parentInput.value.trim(),     // 학부모 성함
-      confirmed: true,
-      signature: '',
+      grade: gradeInput.value,
+      classNum: classInput.value,
+      studentName: studentInput.value.trim(),
+      parentName: parentInput.value.trim(),
+      phone: phoneInput.value.trim(),
+      note: document.getElementById('noteInput').value.trim(),
+      signature: canvas.toDataURL('image/png'),
       submittedAt: new Date().toISOString()
     };
 
@@ -273,8 +476,9 @@
         body: JSON.stringify(payload)
       });
 
-      document.getElementById('doneStudent').textContent = payload.note;
-      document.getElementById('doneParent').textContent = payload.name;
+      document.getElementById('doneStudent').textContent =
+        `${payload.grade} ${payload.classNum} ${payload.studentName}`;
+      document.getElementById('doneParent').textContent = payload.parentName;
       document.getElementById('doneTime').textContent =
         new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit' }).format(new Date());
 
