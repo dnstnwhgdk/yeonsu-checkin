@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>학부모 수업 공개 참관록</title>
+<style>
+  :root {
+    --paper: #F6F4EF;
+    --ink: #22283A;
+    --ink-soft: #5A6072;
+    --line: #D9D5C9;
+    --accent: #2F6F62;
+    --accent-soft: #E4EFE8;
+    --danger: #B3452F;
+  }
+  * { box-sizing: border-box; }
+  html { height: 100%; overscroll-behavior-y: none; }
+  body {
+    margin: 0; padding: 0; min-height: 100%;
+    background: var(--paper); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+  .wrap {
+    max-width: 480px; margin: 0 auto;
+    padding: 32px 20px calc(70px + env(safe-area-inset-bottom));
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
+    -webkit-user-select: none; user-select: none;
+  }
+  input, select, textarea { -webkit-user-select: text; user-select: text; }
+
+  .masthead { border-bottom: 2px solid var(--ink); padding-bottom: 14px; margin-bottom: 26px; }
+  .masthead .kicker { font-size: 13px; color: var(--ink-soft); margin-bottom: 4px; }
+  .masthead h1 { font-size: 21px; line-height: 1.35; margin: 0; font-weight: 700; }
+  .meta-row { font-size: 13px; color: var(--ink-soft); margin-top: 8px; }
+
+  section { margin-bottom: 24px; }
+  .section-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--ink); color: #fff; font-size: 12px; font-weight: 700;
+    margin-right: 8px; flex-shrink: 0;
+  }
+  .section-label {
+    display: flex; align-items: center;
+    font-size: 15px; font-weight: 700; margin-bottom: 12px; color: var(--ink);
+  }
+
+  .field-label { font-size: 13px; color: var(--ink-soft); margin-bottom: 6px; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+
+  input[type="text"], select, textarea {
+    width: 100%; padding: 14px; font-size: 16px;
+    border: 1px solid var(--line); border-radius: 4px;
+    background: #fff; color: var(--ink);
+    -webkit-appearance: none; appearance: none;
+    font-family: inherit;
+  }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+  select {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9'><path d='M1 1l6 6 6-6' stroke='%235A6072' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat; background-position: right 14px center; padding-right: 34px;
+  }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 16px; }
+
+  /* 5점 척도 평가 */
+  .rating-item { margin-bottom: 18px; }
+  .rating-item:last-child { margin-bottom: 0; }
+  .rating-text { font-size: 14px; line-height: 1.55; color: var(--ink); margin-bottom: 10px; }
+  .rating-scale { display: flex; gap: 6px; }
+  .rating-scale label {
+    flex: 1; text-align: center; padding: 10px 0;
+    border: 1px solid var(--line); border-radius: 4px;
+    font-size: 13px; color: var(--ink-soft); cursor: pointer;
+    background: var(--paper); transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+  }
+  .rating-scale input[type="radio"] { display: none; }
+  .rating-scale input[type="radio"]:checked + label {
+    background: var(--ink); color: #fff; border-color: var(--ink);
+  }
+  .rating-scale .num { display: block; font-size: 15px; font-weight: 700; }
+  .rating-scale .cap { display: block; font-size: 10px; margin-top: 2px; }
+
+  .fill-blank {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px;
+    font-size: 15px; line-height: 1.8; color: var(--ink);
+  }
+  .fill-blank input[type="text"] {
+    flex: 1; min-width: 120px; padding: 8px 4px;
+    border: none; border-bottom: 2px solid var(--line);
+    border-radius: 0; background: transparent; text-align: center;
+  }
+  .fill-blank input[type="text"]:focus { outline: none; border-bottom-color: var(--accent); }
+
+  .submit-btn {
+    width: 100%; padding: 17px; font-size: 16px; font-weight: 700; color: #fff;
+    background: var(--ink); border: none; border-radius: 4px; cursor: pointer;
+    transition: background 0.15s ease, opacity 0.15s ease;
+  }
+  .submit-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .submit-btn:not(:disabled):active { background: var(--accent); }
+
+  .error-msg { font-size: 13px; color: var(--danger); margin-top: 10px; display: none; }
+  .status-msg { font-size: 13px; color: var(--ink-soft); margin-top: 12px; text-align: center; min-height: 18px; }
+
+  .done-screen { display: none; text-align: center; padding: 60px 20px; }
+  .done-mark {
+    width: 56px; height: 56px; border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px;
+  }
+  .done-screen h2 { font-size: 19px; margin: 0 0 8px; }
+  .done-screen p { font-size: 14px; color: var(--ink-soft); line-height: 1.6; margin: 0; }
+  .done-detail { margin-top: 24px; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 16px 18px; font-size: 14px; }
+  .done-detail div { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .done-detail div:last-child { border-bottom: none; }
+  .done-detail span:first-child { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<div class="wrap" id="formScreen">
+  <div class="masthead">
+    <div class="kicker">학부모 공개수업 참관록</div>
+    <h1>2026 학부모 수업 공개 참석 소감</h1>
+    <div class="meta-row" id="eventDate">2026-09-01</div>
+  </div>
+
+  <section>
+    <div class="card">
+      <div class="row-2">
+        <div class="field">
+          <div class="field-label">학년</div>
+          <select id="gradeInput">
+            <option value="">선택</option>
+            <option value="1학년">1학년</option>
+            <option value="2학년">2학년</option>
+            <option value="3학년">3학년</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="field-label">반</div>
+          <select id="classInput">
+            <option value="">선택</option>
+            <option value="1반">1반</option><option value="2반">2반</option>
+            <option value="3반">3반</option><option value="4반">4반</option>
+            <option value="5반">5반</option><option value="6반">6반</option>
+            <option value="7반">7반</option><option value="8반">8반</option>
+            <option value="9반">9반</option><option value="10반">10반</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">학생명</div>
+        <input type="text" id="studentInput" placeholder="자녀 이름">
+      </div>
+      <div class="field">
+        <div class="field-label">참관 수업 교과</div>
+        <input type="text" id="subjectInput" placeholder="예) 수학">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label"><span class="section-num">1</span>배움의 모습을 살펴보아요</div>
+    <div class="card" id="ratingCard"></div>
+  </section>
+
+  <section>
+    <div class="section-label"><span class="section-num">2</span>마음에 남은 배움</div>
+    <div class="card">
+      <div class="field">
+        <div class="field-label">오늘 수업에서 인상 깊었던 점은 무엇인가요?</div>
+        <textarea id="impressiveInput" placeholder="자유롭게 적어주세요"></textarea>
+      </div>
+      <div class="field">
+        <div class="field-label">자녀의 수업 참여 모습을 보며 새롭게 발견한 점이나 느낀 점을 적어주세요.</div>
+        <textarea id="discoveryInput" placeholder="자유롭게 적어주세요"></textarea>
+      </div>
+      <div class="field">
+        <div class="field-label">우리 아이들의 더 나은 배움과 성장을 위해 학교에 전할 의견이 있으시면 적어주세요.</div>
+        <textarea id="opinionInput" placeholder="자유롭게 적어주세요 (선택)"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label"><span class="section-num">3</span>오늘 수업을 한마디로 표현한다면?</div>
+    <div class="card">
+      <div class="fill-blank">
+        <span>"오늘 수업은</span>
+        <input type="text" id="onelineInput" placeholder="한마디로">
+        <span>수업이었습니다."</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <button class="submit-btn" id="submitBtn" disabled>제출하기</button>
+    <div class="error-msg" id="errorMsg"></div>
+    <div class="status-msg" id="statusMsg"></div>
+  </section>
+</div>
+
+<div class="wrap done-screen" id="doneScreen">
+  <div class="done-mark">✓</div>
+  <h2>소감이 접수되었습니다</h2>
+  <p>참석해 주셔서 감사합니다. 소중한 의견을 학교 교육활동에 참고하겠습니다.</p>
+  <div class="done-detail">
+    <div><span>학생</span><span id="doneStudent"></span></div>
+    <div><span>참관 교과</span><span id="doneSubject"></span></div>
+    <div><span>제출시각</span><span id="doneTime"></span></div>
+  </div>
+</div>
+
+<script>
+  // ====== 담당자 설정 영역 ======
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTnYK43OVsMazYGMIzanZxeKfo87B_fkdVIBOiYqP6n-B93TZynsvH2dnHzas4IIGZ/exec";
+  const SHEET_NAME = "학부모수업참관록"; // 이 이름으로 시트 탭이 자동 생성/구분됨
+
+  const RATING_ITEMS = [
+    "학생들이 수업에 관심을 가지고 적극적으로 참여하였다.",
+    "학생들이 스스로 생각하고 표현할 기회가 충분히 있었다.",
+    "질문·토의·협력 등을 통해 서로의 생각을 나누었다.",
+    "학생들이 수업을 통해 배우고 성장하는 모습을 확인할 수 있었다."
+  ];
+  // ================================
+
+  document.getElementById('eventDate').textContent =
+    new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date());
+
+  // --- 5점 척도 렌더링 ---
+  const ratingCard = document.getElementById('ratingCard');
+  RATING_ITEMS.forEach((text, idx) => {
+    const item = document.createElement('div');
+    item.className = 'rating-item';
+    const scaleHtml = [5, 4, 3, 2, 1].map(v => {
+      const cap = v === 5 ? '매우그렇다' : v === 1 ? '전혀아니다' : '';
+      return `
+        <input type="radio" name="rating-${idx}" id="rating-${idx}-${v}" value="${v}">
+        <label for="rating-${idx}-${v}"><span class="num">${v}</span><span class="cap">${cap}</span></label>
+      `;
+    }).join('');
+    item.innerHTML = `<div class="rating-text">${idx + 1}. ${text}</div><div class="rating-scale">${scaleHtml}</div>`;
+    ratingCard.appendChild(item);
+    if (idx < RATING_ITEMS.length - 1) {
+      const divider = document.createElement('div');
+      divider.style.cssText = 'height:1px;background:var(--line);margin:16px 0;';
+      ratingCard.appendChild(divider);
+    }
+  });
+
+  ratingCard.querySelectorAll('input[type="radio"]').forEach(r => r.addEventListener('change', validateForm));
+
+  function getRatingValue(idx) {
+    const checked = ratingCard.querySelector(`input[name="rating-${idx}"]:checked`);
+    return checked ? checked.value : '';
+  }
+  function allRatingsFilled() {
+    return RATING_ITEMS.every((_, idx) => getRatingValue(idx) !== '');
+  }
+
+  // --- 유효성 검사 ---
+  const gradeInput = document.getElementById('gradeInput');
+  const classInput = document.getElementById('classInput');
+  const studentInput = document.getElementById('studentInput');
+  const subjectInput = document.getElementById('subjectInput');
+  const impressiveInput = document.getElementById('impressiveInput');
+  const discoveryInput = document.getElementById('discoveryInput');
+  const onelineInput = document.getElementById('onelineInput');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function validateForm() {
+    const ok =
+      gradeInput.value !== '' && classInput.value !== '' &&
+      studentInput.value.trim().length > 0 && subjectInput.value.trim().length > 0 &&
+      allRatingsFilled() &&
+      impressiveInput.value.trim().length > 0 &&
+      discoveryInput.value.trim().length > 0;
+    submitBtn.disabled = !ok;
+    return ok;
+  }
+  [gradeInput, classInput, studentInput, subjectInput, impressiveInput, discoveryInput].forEach(el => {
+    el.addEventListener('input', validateForm);
+    el.addEventListener('change', validateForm);
+  });
+
+  // --- 제출 ---
+  submitBtn.addEventListener('click', async () => {
+    const errorEl = document.getElementById('errorMsg');
+    const statusEl = document.getElementById('statusMsg');
+    errorEl.style.display = 'none';
+
+    if (!validateForm()) return;
+
+    submitBtn.disabled = true;
+    statusEl.textContent = '제출 중입니다...';
+
+    const payload = {
+      formType: 'class_feedback',
+      department: SHEET_NAME,
+      grade: gradeInput.value,
+      classNum: classInput.value,
+      studentName: studentInput.value.trim(),
+      subject: subjectInput.value.trim(),
+      rating1: getRatingValue(0),
+      rating2: getRatingValue(1),
+      rating3: getRatingValue(2),
+      rating4: getRatingValue(3),
+      impressive: impressiveInput.value.trim(),
+      discovery: discoveryInput.value.trim(),
+      opinion: document.getElementById('opinionInput').value.trim(),
+      oneline: onelineInput.value.trim(),
+      submittedAt: new Date().toISOString()
+    };
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+
+      document.getElementById('doneStudent').textContent = `${payload.grade} ${payload.classNum} ${payload.studentName}`;
+      document.getElementById('doneSubject').textContent = payload.subject;
+      document.getElementById('doneTime').textContent =
+        new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit' }).format(new Date());
+
+      document.getElementById('formScreen').style.display = 'none';
+      document.getElementById('doneScreen').style.display = 'block';
+    } catch (err) {
+      statusEl.textContent = '';
+      errorEl.textContent = '제출에 실패했습니다. 네트워크 상태를 확인하고 다시 시도해 주세요.';
+      errorEl.style.display = 'block';
+      submitBtn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>
