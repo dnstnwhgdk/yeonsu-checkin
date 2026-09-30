@@ -36,6 +36,10 @@ function doPost(e) {
       return handleBriefingApply_(data);
     }
 
+    if (formType === 'attendance_signed') {
+      return handleAttendanceSigned_(data);
+    }
+
     const sheetName = sanitizeSheetName_(data.department || data.trainingTitle || DEFAULT_SHEET_NAME);
     const sheet = getOrCreateSheet_(sheetName, formType);
     const folder = getOrCreateFolder_();
@@ -121,6 +125,39 @@ function handleClassFeedback_(data) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+
+// 학부모 공개수업 및 연수 출석체크: 학생명/학년반/학부모명 + 서명
+function handleAttendanceSigned_(data) {
+  const sheetName = sanitizeSheetName_(data.department || '고교학점제출석체크');
+  const sheet = getOrCreateSheet_(sheetName, 'attendance_signed');
+  const folder = getOrCreateFolder_();
+  const now = new Date();
+  const stamp = Utilities.formatDate(now, 'Asia/Seoul', 'yyyyMMdd_HHmmss');
+  const safeName = String(data.parentName || '무명').replace(/[^\w가-힣]/g, '');
+  const base64 = String(data.signature || '').split(',')[1] || '';
+  let signatureUrl = '';
+
+  if (base64) {
+    const blob = Utilities.newBlob(Utilities.base64Decode(base64), 'image/png', `${sheetName}_${safeName}_${stamp}.png`);
+    const file = folder.createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    signatureUrl = file.getUrl();
+  }
+
+  sheet.appendRow([
+    now,
+    data.studentName || '',
+    data.grade || '',
+    data.classNum || '',
+    data.parentName || '',
+    signatureUrl,
+    data.submittedAt || ''
+  ]);
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ result: 'success', sheet: sheetName }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
 
 // 고교학점제 설명회 신청: 학생 이름/학년반/학부모 이름만 받아서 단일 시트에 기록
 function handleBriefingApply_(data) {
@@ -228,6 +265,8 @@ function getOrCreateSheet_(sheetName, formType) {
       sheet.appendRow(['제출시각', '학년', '반', '학생명', '참관교과', '평가1_참여', '평가2_표현기회', '평가3_소통협력', '평가4_성장확인', '인상깊었던점', '새롭게발견한점', '학교에전할의견', '한마디표현', '클라이언트 제출시각']);
     } else if (formType === 'briefing_apply') {
       sheet.appendRow(['제출시각', '학생명', '학년', '반', '학부모명', '클라이언트 제출시각']);
+    } else if (formType === 'attendance_signed') {
+      sheet.appendRow(['제출시각', '학생명', '학년', '반', '학부모명', '서명이미지', '클라이언트 제출시각']);
     } else {
       sheet.appendRow(['제출시각', '부서', '연수명', '자녀/학생', '이름', '확인여부', '서명이미지', '클라이언트 제출시각']);
     }
